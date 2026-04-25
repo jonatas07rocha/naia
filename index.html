@@ -4,19 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NAIA | Llama 3.3</title>
-  <!-- Ícones e Parser de Markdown -->
+  <!-- Bibliotecas Externas -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    /* Definição de Variáveis para Temas */
     :root {
-      --primary: #eab308; /* Mostarda */
+      --primary: #eab308;
       --primary-hover: #ca8a04;
       --success: #10b981;
       --error: #ef4444;
       --warning: #f59e0b;
       
-      /* Dark Mode (Padrão) */
       --bg-main: #0f172a;
       --bg-chat: #1e293b;
       --bg-input: #0f172a;
@@ -82,19 +80,6 @@
       gap: 8px;
     }
 
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.7rem;
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    /* Alerta de Limite */
     #limit-warning {
       display: none;
       background: rgba(245, 158, 11, 0.15);
@@ -117,10 +102,8 @@
       flex-direction: column;
       gap: 20px;
       scroll-behavior: smooth;
-      background-color: var(--bg-main);
     }
 
-    /* Estilo de Avatar */
     .avatar {
       width: 36px;
       height: 36px;
@@ -135,7 +118,7 @@
       background: var(--primary);
       color: var(--bot-text);
       margin-right: 12px;
-      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
+      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.2);
     }
 
     .user-avatar {
@@ -152,15 +135,8 @@
       align-items: flex-end;
     }
 
-    .user-wrapper { 
-      align-self: flex-end; 
-      flex-direction: row;
-    }
-    
-    .bot-wrapper { 
-      align-self: flex-start;
-      flex-direction: row;
-    }
+    .user-wrapper { align-self: flex-end; flex-direction: row; }
+    .bot-wrapper { align-self: flex-start; flex-direction: row; }
 
     .message {
       padding: 12px 18px;
@@ -168,7 +144,6 @@
       line-height: 1.6;
       font-size: 0.95rem;
       word-wrap: break-word;
-      position: relative;
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
@@ -184,18 +159,16 @@
       border-bottom-left-radius: 4px;
     }
 
-    .bot-wrapper .message strong { color: inherit; font-weight: 800; }
-    .bot-wrapper .message code { background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px; }
     .message p { margin: 0 0 10px 0; }
     .message p:last-child { margin-bottom: 0; }
-
-    .label { display: none; }
+    .message strong { font-weight: 800; }
+    .message code { background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    .message ul, .message ol { margin: 0 0 10px 0; padding-left: 20px; }
 
     footer {
       padding: 15px 20px 25px;
       background: var(--bg-chat);
       border-top: 1px solid var(--border);
-      z-index: 10;
     }
 
     .input-area {
@@ -228,7 +201,6 @@
       border-radius: 10px;
       display: flex;
       align-items: center;
-      justify-content: center;
       transition: all 0.2s;
     }
 
@@ -240,14 +212,13 @@
       width: 50px;
       height: 50px;
       border-radius: 12px;
+      justify-content: center;
       flex-shrink: 0;
       box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
     }
 
     .send-btn:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4); }
-    .send-btn:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
 
-    /* Modais */
     .modal {
       display: none;
       position: fixed;
@@ -267,14 +238,9 @@
       border-radius: 24px;
       padding: 30px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-    .btn-save { background: var(--primary); color: var(--bot-text); padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
-    
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
     .typing-dots { display: flex; gap: 4px; padding: 10px 0; }
     .dot { width: 6px; height: 6px; background: var(--bot-text); border-radius: 50%; animation: bounce 1.4s infinite both; opacity: 0.4; }
     @keyframes bounce { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; } 40% { transform: scale(1.2); opacity: 1; } }
@@ -288,9 +254,6 @@
     <span>NA<span class="ai-highlight">IA</span></span>
   </div>
   <div class="header-actions">
-    <div id="api-status" class="status-pill" style="display:none">
-      <i data-lucide="shield-check" size="14"></i> Ativa
-    </div>
     <button class="btn" onclick="toggleTheme()" title="Alternar Tema">
       <i data-lucide="sun" id="theme-icon-sun" style="display:none"></i>
       <i data-lucide="moon" id="theme-icon-moon"></i>
@@ -303,15 +266,12 @@
 
 <div id="limit-warning">
   <i data-lucide="alert-triangle" size="14"></i>
-  <span>Atenção: Você está próximo do limite diário de mensagens (Llama 3.3).</span>
+  <span>Aviso: Próximo ao limite diário (SambaNova Cloud).</span>
 </div>
 
 <div id="chat-container">
-  <!-- Mensagem Inicial com Avatar -->
   <div class="message-wrapper bot-wrapper">
-    <div class="avatar bot-avatar">
-      <i data-lucide="lightbulb" size="20"></i>
-    </div>
+    <div class="avatar bot-avatar"><i data-lucide="lightbulb" size="20"></i></div>
     <div class="message">
       <p>Olá! Sou a <strong>NAIA</strong>. Estou pronta para auxiliar você com reflexões, análises precisas e objetivas. Como posso ajudar?</p>
     </div>
@@ -333,20 +293,20 @@
     <p style="font-size:0.85rem; color:var(--text-muted)">A chave SambaNova e suas preferências são salvas localmente.</p>
     <div style="margin-top:20px;">
       <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Chave API (SambaNova)</label>
-      <input type="password" id="api-key-input" style="width:100%; box-sizing:border-box;" placeholder="gsk_...">
+      <input type="password" id="api-key-input" style="width:100%; box-sizing:border-box; padding:12px; border-radius:8px; background:var(--bg-main); border:1px solid var(--border); color:white;" placeholder="gsk_...">
     </div>
-    <div class="modal-actions">
+    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
       <button onclick="toggleModal(false)" style="background:transparent; border:none; color:var(--text-main); cursor:pointer;">Cancelar</button>
-      <button class="btn-save" onclick="saveSettings()">Salvar</button>
+      <button onclick="saveSettings()" style="background:var(--primary); color:var(--bot-text); padding:10px 20px; border-radius:8px; font-weight:600; border:none; cursor:pointer;">Salvar</button>
     </div>
   </div>
 </div>
 
 <script>
-  const STORAGE_KEY = 'naia_v2_settings';
-  const USAGE_KEY = 'naia_v2_usage';
+  const SETTINGS_KEY = 'naia_cloud_optimized_v1';
+  const USAGE_KEY = 'naia_cloud_usage_v1';
   
-  let settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { apiKey: '', theme: 'dark' };
+  let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || { apiKey: '', theme: 'dark' };
   
   const API_URL = "https://api.sambanova.ai/v1/chat/completions";
   const MODEL = "Meta-Llama-3.3-70B-Instruct";
@@ -354,30 +314,23 @@
 
   marked.setOptions({ breaks: true, gfm: true });
 
-  // Inicialização de Tema
   function applyTheme(theme) {
     document.body.setAttribute('data-theme', theme);
     document.getElementById('theme-icon-sun').style.display = theme === 'light' ? 'none' : 'block';
     document.getElementById('theme-icon-moon').style.display = theme === 'light' ? 'block' : 'none';
     settings.theme = theme;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     lucide.createIcons();
   }
 
   function toggleTheme() {
-    const newTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    applyTheme(newTheme);
+    applyTheme(document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   }
 
-  // Rastreamento de Uso
   function getUsage() {
     const today = new Date().toISOString().split('T')[0];
     let usage = JSON.parse(localStorage.getItem(USAGE_KEY)) || { date: today, count: 0 };
-    
-    if (usage.date !== today) {
-      usage = { date: today, count: 0 };
-      localStorage.setItem(USAGE_KEY, JSON.stringify(usage));
-    }
+    if (usage.date !== today) usage = { date: today, count: 0 };
     return usage;
   }
 
@@ -393,15 +346,10 @@
     const warningEl = document.getElementById('limit-warning');
     if (usage.count >= 15) {
       warningEl.style.display = 'flex';
-      warningEl.querySelector('span').innerText = `Aviso: Você usou ${usage.count}/${DAILY_LIMIT} mensagens diárias.`;
+      warningEl.querySelector('span').innerText = `Uso diário: ${usage.count}/${DAILY_LIMIT} mensagens.`;
     } else {
       warningEl.style.display = 'none';
     }
-  }
-
-  function checkKeyStatus() {
-    const statusPill = document.getElementById('api-status');
-    statusPill.style.display = settings.apiKey ? 'flex' : 'none';
   }
 
   function toggleModal(show) {
@@ -410,39 +358,23 @@
   }
 
   function saveSettings() {
-    const key = document.getElementById('api-key-input').value.trim();
-    if (key) {
-      settings.apiKey = key;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-      checkKeyStatus();
-      toggleModal(false);
-    }
+    settings.apiKey = document.getElementById('api-key-input').value.trim();
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    toggleModal(false);
   }
 
   function addMessageUI(text, type) {
     const container = document.getElementById('chat-container');
     const wrapper = document.createElement('div');
     wrapper.className = `message-wrapper ${type}-wrapper`;
-    
     const avatarIcon = type === 'user' ? 'user' : 'lightbulb';
     const avatarClass = type === 'user' ? 'user-avatar' : 'bot-avatar';
-    
     const content = type === 'bot' ? marked.parse(text) : `<p>${text}</p>`;
 
-    let innerHTML = '';
-    if (type === 'bot') {
-        innerHTML = `
-            <div class="avatar ${avatarClass}"><i data-lucide="${avatarIcon}" size="20"></i></div>
-            <div class="message">${content}</div>
-        `;
-    } else {
-        innerHTML = `
-            <div class="message">${content}</div>
-            <div class="avatar ${avatarClass}"><i data-lucide="${avatarIcon}" size="20"></i></div>
-        `;
-    }
+    wrapper.innerHTML = type === 'bot' 
+      ? `<div class="avatar ${avatarClass}"><i data-lucide="${avatarIcon}" size="20"></i></div><div class="message">${content}</div>`
+      : `<div class="message">${content}</div><div class="avatar ${avatarClass}"><i data-lucide="${avatarIcon}" size="20"></i></div>`;
 
-    wrapper.innerHTML = innerHTML;
     container.appendChild(wrapper);
     container.scrollTop = container.scrollHeight;
     lucide.createIcons();
@@ -458,7 +390,7 @@
 
     const usage = getUsage();
     if (usage.count >= DAILY_LIMIT) {
-      addMessageUI("Limite diário atingido (20 mensagens). Por favor, aguarde até amanhã ou use o modo local.", "bot");
+      addMessageUI("Limite diário de mensagens atingido. Retorne amanhã.", "bot");
       return;
     }
 
@@ -470,12 +402,7 @@
     const loader = document.createElement('div');
     loader.className = 'message-wrapper bot-wrapper';
     loader.id = loaderId;
-    loader.innerHTML = `
-      <div class="avatar bot-avatar"><i data-lucide="lightbulb" size="20"></i></div>
-      <div class="message">
-        <div class="typing-dots"><div class="dot"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div>
-      </div>
-    `;
+    loader.innerHTML = `<div class="avatar bot-avatar"><i data-lucide="lightbulb" size="20"></i></div><div class="message"><div class="typing-dots"><div class="dot"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div></div>`;
     document.getElementById('chat-container').appendChild(loader);
     document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
     lucide.createIcons();
@@ -483,19 +410,15 @@
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${settings.apiKey}`,
-          "Content-Type": "application/json"
-        },
+        headers: { "Authorization": `Bearer ${settings.apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           model: MODEL,
           messages: [
             { 
               role: "system", 
-              content: "Você é a NAIA, um assistente de inteligência artificial útil, preciso e objetivo. Responda sempre em Português do Brasil. Mantenha um tom profissional e direto. Use Markdown para formatar suas respostas. Seja técnico e respeite evidências científicas." 
+              content: "Você é a NAIA, um assistente de inteligência artificial útil, preciso e objetivo. Responda sempre em Português do Brasil. Mantenha um tom profissional e direto. Use formatação Markdown APENAS quando for essencial para a legibilidade (como listas, tabelas ou códigos). Evite formatação excessiva em parágrafos simples para garantir a máxima velocidade de saída. Seja técnico e respeite evidências científicas." 
             },
-            { role: "user", content: text }
-          ],
+            { role: "user", content: text }],
           temperature: 0.1
         })
       });
@@ -505,13 +428,12 @@
       if (loaderElement) loaderElement.remove();
 
       if (data.error) throw new Error(data.error.message);
-      
       incrementUsage();
       addMessageUI(data.choices[0].message.content, 'bot');
     } catch (err) {
       const loaderElement = document.getElementById(loaderId);
       if (loaderElement) loaderElement.remove();
-      addMessageUI(`Erro de conexão: ${err.message}`, 'bot');
+      addMessageUI(`Erro: ${err.message}`, 'bot');
     } finally {
       btn.disabled = false;
       input.focus();
@@ -519,8 +441,9 @@
   }
 
   applyTheme(settings.theme);
-  checkKeyStatus();
   checkUsageWarning();
 </script>
 </body>
 </html>
+
+```
